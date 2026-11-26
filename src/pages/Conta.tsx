@@ -2,6 +2,7 @@ import { toast } from 'sonner';
 import { useSessao } from '@/hooks/sessao';
 import { Button } from '@/components/ui/button';
 import { FormTrocarSenha } from '@/components/FormTrocarSenha';
+import { CartaoInstalar } from '@/components/InstalarApp';
 
 export default function Conta() {
   const { perfil, sair } = useSessao();
@@ -15,6 +16,9 @@ export default function Conta() {
         <h2 className="mb-4 text-base font-bold">Trocar senha</h2>
         <FormTrocarSenha aoTrocar={() => toast.success('Senha trocada. Use a nova no próximo acesso.')} />
       </section>
+      <div className="mt-5">
+        <CartaoInstalar />
+      </div>
       <Button variante="contorno" className="mt-6 sm:hidden" onClick={sair}>
         Sair
       </Button>

@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Esqueleto } from '@/components/ui/esqueleto';
 import { PontoStatus } from '@/components/ui/status';
 import { FichaJovem } from '@/components/FichaJovem';
+import { AvisoInstalar } from '@/components/InstalarApp';
 import { STATUS_ROTULO } from '@/lib/perguntas';
 import type { Ficha, Status } from '@/lib/tipos';
 import { cn, semAcento } from '@/lib/utils';
@@ -162,6 +163,7 @@ export function Acompanhamento() {
           </div>
         </div>
 
+        <AvisoInstalar className="mx-3 mt-3" />
         <div className="flex items-center justify-between px-3.5 pb-1 pt-2.5 text-[12.5px] text-ink-2">
           <span className="tabular" aria-live="polite">
             {carregando ? 'Carregando…' : `${visiveis.length} ${visiveis.length === 1 ? 'jovem' : 'jovens'}`}
