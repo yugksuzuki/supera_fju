@@ -9,6 +9,7 @@ interface Sessao {
   perfil: Responsavel | null;
   admin: boolean;
   sair: () => Promise<void>;
+  senhaTrocada: () => void;
 }
 
 const Ctx = createContext<Sessao | null>(null);
@@ -40,7 +41,7 @@ export function SessaoProvider({ children }: { children: ReactNode }) {
     setCarregando(true);
     supabase
       .from('responsaveis')
-      .select('id, nome, email, user_id, papel, ativo')
+      .select('id, nome, email, user_id, papel, ativo, trocar_senha')
       .eq('user_id', userId)
       .maybeSingle()
       .then(({ data }) => {
@@ -61,6 +62,7 @@ export function SessaoProvider({ children }: { children: ReactNode }) {
     sair: async () => {
       await supabase.auth.signOut();
     },
+    senhaTrocada: () => setPerfil((p) => (p ? { ...p, trocar_senha: false } : p)),
   };
   return <Ctx value={valor}>{children}</Ctx>;
 }

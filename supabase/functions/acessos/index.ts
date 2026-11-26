@@ -1,4 +1,5 @@
 // Define a senha de acesso de alguém da equipe. Só admin pode chamar.
+// A senha definida pelo admin é provisória: a pessoa troca no primeiro acesso.
 // POST { responsavel_id: string, senha: string }
 import 'jsr:@supabase/functions-js/edge-runtime.d.ts';
 import { createClient } from 'npm:@supabase/supabase-js@2';
@@ -53,10 +54,12 @@ Deno.serve(async (req) => {
   if (alvo.user_id) {
     const { error } = await admin.auth.admin.updateUserById(alvo.user_id, { password: senha, email_confirm: true });
     if (error) return resposta({ erro: 'falhou', detalhe: error.message }, 400);
+    await admin.from('responsaveis').update({ trocar_senha: true }).eq('id', alvo.id);
     return resposta({ ok: true, criado: false });
   }
   // O gatilho privado.vincular_usuario liga a conta nova ao cadastro pelo e-mail.
   const { error } = await admin.auth.admin.createUser({ email: alvo.email, password: senha, email_confirm: true });
   if (error) return resposta({ erro: 'falhou', detalhe: error.message }, 400);
+  await admin.from('responsaveis').update({ trocar_senha: true }).eq('id', alvo.id);
   return resposta({ ok: true, criado: true });
 });

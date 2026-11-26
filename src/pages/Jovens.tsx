@@ -33,7 +33,7 @@ export default function Jovens() {
   useEffect(() => {
     Promise.all([
       supabase.from('aulas').select('id, nome').order('nome'),
-      supabase.from('responsaveis').select('id, nome, email, user_id, papel, ativo').order('nome'),
+      supabase.from('responsaveis').select('id, nome, email, user_id, papel, ativo, trocar_senha').order('nome'),
     ]).then(([a, r]) => {
       setAulas((a.data as Aula[]) ?? []);
       setEquipe((r.data as Responsavel[]) ?? []);

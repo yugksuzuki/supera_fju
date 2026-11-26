@@ -7,9 +7,11 @@ e-mail e senha, função `acessos` (admin cria e troca senhas), conta oficial da
 - [ ] Publicar na Vercel e ajustar o Supabase: roteiro pronto em [claude-no-chrome.md](claude-no-chrome.md).
 
 ## Equipe
-- [ ] Entrar com a conta da FJU, aba Equipe: colocar e-mail e senha da Júlia Souza e do Obr Gabriel
-      Bulhões e mandar o convite pelo WhatsApp.
-- [ ] O cadastro "Guilherme Suzuki" (admin) ainda não tem senha: definir na aba Equipe se for usar.
+- [x] Acessos criados com senha provisória (troca obrigatória no primeiro login): Guilherme Suzuki (admin),
+      FJU Universitários (admin), Júlia Souza e Obr Gabriel Bulhões (voluntários).
+- [ ] Mandar para cada um o link do site + e-mail + senha provisória (botão Convite na aba Equipe).
+- [ ] A conta oficial da Força Jovem usa a mesma senha da provisória e **não** pede troca. Trocar a senha
+      dela em "Minha conta" depois que todos tiverem entrado.
 
 ## Conferir dados da planilha
 - [ ] 11 contatos aparecem como "Jovem (sem nome salvo)": trocar pelo nome real na aba Jovens.

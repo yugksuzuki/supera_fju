@@ -11,6 +11,7 @@ export interface Responsavel {
   user_id: string | null;
   papel: Papel;
   ativo: boolean;
+  trocar_senha: boolean;
 }
 
 export interface Aula {

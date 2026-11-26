@@ -6,6 +6,7 @@ import { FichasProvider } from '@/hooks/fichas';
 import { Topo } from '@/components/Topo';
 import { Entrar } from '@/pages/Entrar';
 import { SemAcesso } from '@/pages/SemAcesso';
+import { PrimeiraSenha } from '@/pages/PrimeiraSenha';
 import { Acompanhamento } from '@/pages/Acompanhamento';
 import { Esqueleto } from '@/components/ui/esqueleto';
 
@@ -28,6 +29,7 @@ function Rotas() {
   if (carregando) return <Carregando />;
   if (!sessao) return <Entrar />;
   if (!perfil || !perfil.ativo) return <SemAcesso />;
+  if (perfil.trocar_senha) return <PrimeiraSenha />;
 
   return (
     <FichasProvider>

@@ -26,7 +26,10 @@ export default function Equipe() {
   const [salvando, setSalvando] = useState(false);
 
   const carregar = useCallback(async () => {
-    const { data } = await supabase.from('responsaveis').select('id, nome, email, user_id, papel, ativo').order('nome');
+    const { data } = await supabase
+      .from('responsaveis')
+      .select('id, nome, email, user_id, papel, ativo, trocar_senha')
+      .order('nome');
     setEquipe((data as Responsavel[]) ?? []);
   }, []);
   useEffect(() => {
@@ -88,7 +91,7 @@ export default function Equipe() {
   }
 
   const convite = (r: Responsavel) =>
-    `Olá, ${r.nome.split(' ')[0]}! Você já pode registrar o acompanhamento dos jovens do SUPERA em ${window.location.origin}. Entre com o e-mail ${r.email} e a senha que eu te passei. Depois, se quiser, troque a senha clicando no seu nome lá em cima.`;
+    `Olá, ${r.nome.split(' ')[0]}! Você já pode registrar o acompanhamento dos jovens do SUPERA em ${window.location.origin}. Entre com o e-mail ${r.email} e a senha que eu te passei. No primeiro acesso o sistema pede para você criar a sua própria senha.`;
 
   return (
     <main className="mx-auto grid max-w-[1240px] items-start gap-5 px-4 py-5 md:px-6 lg:grid-cols-[minmax(0,1fr)_380px]">
@@ -131,10 +134,15 @@ export default function Equipe() {
               <span
                 className={cn(
                   'inline-flex h-7 items-center rounded-full px-2.5 text-xs font-semibold',
-                  r.user_id ? 'bg-ok-tint text-ok' : 'bg-surface-2 text-ink-2',
+                  !r.user_id
+                    ? 'bg-surface-2 text-ink-2'
+                    : r.trocar_senha
+                      ? 'bg-warn-tint text-warn'
+                      : 'bg-ok-tint text-ok',
                 )}
+                title={r.trocar_senha ? 'Ainda não trocou a senha provisória' : undefined}
               >
-                {r.user_id ? 'Com acesso' : 'Sem senha'}
+                {!r.user_id ? 'Sem senha' : r.trocar_senha ? 'Senha provisória' : 'Com acesso'}
               </span>
               <div className="flex gap-1.5">
                 {r.email && r.user_id && r.ativo && r.id !== perfil?.id ? (
