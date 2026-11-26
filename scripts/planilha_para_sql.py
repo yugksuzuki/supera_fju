@@ -5,7 +5,8 @@ Depois rode o seed.sql no SQL Editor do Supabase (ou peça ao Claude para rodar)
 
 Colunas esperadas (aba 1, linha 1 = cabeçalho):
   A Nome | B Aula que frequenta | C Responsável | D..H respostas (ignoradas, exceto D e E)
-"Inglês B e Informática" e "Francês/DEV" viram duas aulas; "Inglês B 2" vira "Inglês B"
+"Inglês B e Informática" e "Francês/DEV" viram duas aulas; "Inglês B 2" vira "Inglês Básico";
+abreviações da planilha viram o nome oficial (ENEM -> Desafiando o ENEM, etc.)
 (o texto original fica em jovens.aula_original para conferência).
 O arquivo gerado tem nomes de jovens: NÃO faça commit dele (já está no .gitignore).
 """
@@ -18,8 +19,23 @@ q = lambda s: "'" + str(s).replace("'", "''") + "'"
 SN = {'sim': 'sim', 'não': 'nao', 'nao': 'nao'}
 
 
+# Nome como vem na planilha -> nome oficial da aula
+OFICIAL = {
+    'ENEM': 'Desafiando o ENEM',
+    'Inglês B': 'Inglês Básico',
+    'Inglês I': 'Inglês Intermediário',
+    'MOTIVA': 'Motiva',
+    'SUPERA': 'Supera',
+}
+
+
+def oficial(parte):
+    parte = re.sub(r'^(Inglês [BI]) \d$', r'\1', parte.strip())  # "Inglês B 2" = Inglês B
+    return OFICIAL.get(parte, parte)
+
+
 def aulas(txt):
-    return [re.sub(r'^(Inglês [BI]) \d$', r'\1', p.strip()) for p in re.split(r'\s+e\s+|/', txt.strip()) if p.strip()]
+    return [oficial(p) for p in re.split(r'\s+e\s+|/', txt.strip()) if p.strip()]
 
 
 def main(caminho):
@@ -41,10 +57,13 @@ def main(caminho):
     print('  select d.nome, d.aula_original, (select id from public.responsaveis r where r.nome = d.responsavel limit 1) from dados d')
     print('  returning id, nome, aula_original')
     print('), aulas_ins as (')
+    mapa = ', '.join(f"({q(a)}, {q(b)})" for a, b in OFICIAL.items())
     print("  insert into public.jovem_aulas (jovem_id, aula_id)")
     print("  select distinct ins.id, a.id from ins")
     print("  cross join lateral regexp_split_to_table(ins.aula_original, '\\s+e\\s+|/') as p(parte)")
-    print("  join public.aulas a on a.nome = regexp_replace(trim(p.parte), '^(Inglês [BI]) \\d$', '\\1')")
+    print("  cross join lateral (select regexp_replace(trim(p.parte), '^(Inglês [BI]) \\d$', '\\1') as curto) c")
+    print(f"  left join (values {mapa}) m(curto, oficial) on m.curto = c.curto")
+    print("  join public.aulas a on a.nome = coalesce(m.oficial, c.curto)")
     print('  returning 1')
     print(')')
     print('insert into public.acompanhamentos (jovem_id, contato, respondeu)')

@@ -14,8 +14,9 @@ e-mail e senha, função `acessos` (admin cria e troca senhas), conta oficial da
 ## Conferir dados da planilha
 - [ ] 11 contatos aparecem como "Jovem (sem nome salvo)": trocar pelo nome real na aba Jovens.
 - [ ] "Sss (nome estilizado, conferir)": corrigir o nome.
-- [ ] "Inglês B 2", "Inglês B 3" e "Inglês I 2" foram tratados como Inglês B / Inglês I.
-      Se forem turmas diferentes, criar a aula na aba Jovens e reatribuir.
+- [ ] Aulas oficiais confirmadas (9): Desafiando o ENEM, Informática, Inglês Básico, Inglês Intermediário,
+      Francês, DEV, Espanhol, Motiva, Supera. Os 3 contatos "Inglês B 2/B 3/I 2" (sem nome, da Júlia)
+      foram para Inglês Básico/Intermediário; o número parecia só diferenciar contatos repetidos.
 - [ ] Nenhum jovem tem telefone ainda; com telefone, a ficha ganha o botão de WhatsApp.
 
 ## Depois (opcional)
