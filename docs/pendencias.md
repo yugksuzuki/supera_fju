@@ -3,13 +3,16 @@
 Feito: banco no Supabase (`supera-fju`, São Paulo), RLS, 107 jovens importados, app React, login por
 e-mail e senha, função `acessos` (admin cria e troca senhas), conta oficial da FJU como admin.
 
-## Para colocar no ar
-- [ ] Publicar na Vercel e ajustar o Supabase: roteiro pronto em [claude-no-chrome.md](claude-no-chrome.md).
+## No ar
+- [x] Publicado em https://supera-fju.vercel.app (Vercel, projeto `supera-fju`, ligado ao GitHub;
+      push na branch `claude/vibrant-pascal-56waqf` publica sozinho). App instalável (PWA).
+- [ ] Opcional: desligar o cadastro aberto no Supabase. Roteiro em [claude-no-chrome.md](claude-no-chrome.md).
 
 ## Equipe
 - [x] Acessos criados com senha provisória (troca obrigatória no primeiro login): Guilherme Suzuki (admin),
       FJU Universitários (admin), Júlia Souza e Obr Gabriel Bulhões (voluntários).
-- [ ] Mandar para cada um o link do site + e-mail + senha provisória (botão Convite na aba Equipe).
+- [ ] Mandar para cada um o link https://supera-fju.vercel.app + e-mail + senha provisória (botão Convite na aba
+      Equipe) e pedir para instalar na tela inicial.
 - [ ] A conta oficial da Força Jovem usa a mesma senha da provisória e **não** pede troca. Trocar a senha
       dela em "Minha conta" depois que todos tiverem entrado.
 

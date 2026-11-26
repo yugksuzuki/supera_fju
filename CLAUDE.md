@@ -1,6 +1,8 @@
 # SUPERA · Acompanhamento — contexto para o Claude
 
 - Cliente/frente: Força Jovem Universal (FJU), programa SUPERA. Dono: Gui (conta pessoal).
+- No ar: https://supera-fju.vercel.app (Vercel `supera-fju`, team yugksuzukis-projects, deploy automático da
+  branch `claude/vibrant-pascal-56waqf`). PWA: `public/manifest.webmanifest` + `public/sw.js`.
 - Supabase: projeto `supera-fju`, ref `xqchheolsazkonyyleki`, região sa-east-1.
 - Stack: cuoncient-web-stack (React). pnpm, nunca npm. Design: impeccable, modo Operate; ver DESIGN.md.
 - **Repositório público:** nunca commitar nomes, telefones ou planilhas de jovens. Carga de dados só

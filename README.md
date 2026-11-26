@@ -1,5 +1,7 @@
 # SUPERA · Acompanhamento de Jovens
 
+No ar: **https://supera-fju.vercel.app** (instalável na tela inicial do Android e do iPhone).
+
 Sistema da Força Jovem Universal para a equipe do SUPERA acompanhar cada jovem: contato,
 resposta, frequência nas aulas, repasse ao cabeça de tribo e observações com data e autor.
 
