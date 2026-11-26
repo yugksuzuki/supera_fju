@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { Link } from 'wouter';
 import { Download, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
@@ -10,6 +10,7 @@ import type { Ficha, Status } from '@/lib/tipos';
 import { Button } from '@/components/ui/button';
 import { PontoStatus } from '@/components/ui/status';
 import { cn, relativo } from '@/lib/utils';
+import { gsap, useGSAP, semMovimento } from '@/lib/movimento';
 
 const ORDEM: Status[] = ['concluido', 'andamento', 'pendente'];
 const BARRA: Record<Status, string> = { concluido: 'bg-ok', andamento: 'bg-warn-dot', pendente: 'bg-idle' };
@@ -24,6 +25,23 @@ const contar = (lista: Ficha[]): Contagem => {
 export default function Painel() {
   const { fichas, carregando } = useFichas();
   const [exportando, setExportando] = useState(false);
+  const ref = useRef<HTMLElement>(null);
+
+  // Ao abrir o painel, as barras crescem da esquerda: mostra o tamanho de cada grupo.
+  useGSAP(
+    () => {
+      if (semMovimento() || carregando) return;
+      gsap.from('[data-barra]', {
+        scaleX: 0,
+        transformOrigin: 'left center',
+        duration: 0.9,
+        stagger: 0.035,
+        ease: 'expo.out',
+        clearProps: 'transform',
+      });
+    },
+    { scope: ref, dependencies: [carregando] },
+  );
   const ativos = useMemo(() => fichas.filter((f) => f.ativo), [fichas]);
   const geral = useMemo(() => contar(ativos), [ativos]);
 
@@ -60,7 +78,7 @@ export default function Painel() {
   }
 
   return (
-    <main className="mx-auto max-w-[1240px] space-y-5 px-4 py-5 md:px-6">
+    <main ref={ref} className="mx-auto max-w-[1240px] space-y-5 px-4 py-5 md:px-6">
       <section className="rounded-2xl border border-line bg-surface p-5 shadow-1 md:p-6">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
@@ -140,6 +158,7 @@ const pct = (n: number, t: number) => (t ? Math.round((n / t) * 100) : 0);
 function BarraEmpilhada({ c, className }: { c: Contagem; className?: string }) {
   return (
     <div
+      data-barra
       className={cn('flex overflow-hidden rounded-full bg-surface-2', className)}
       role="img"
       aria-label={ORDEM.map((s) => `${STATUS_ROTULO[s]}: ${c[s]}`).join(', ')}

@@ -1,10 +1,13 @@
-import { useState, type FormEvent } from 'react';
+import { lazy, Suspense, useRef, useState, type FormEvent } from 'react';
 import { Eye, EyeOff, Loader2 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { Button } from '@/components/ui/button';
 import { Input, Rotulo } from '@/components/ui/campos';
 import { Selo } from '@/components/Selo';
 import { SerraBorda } from '@/components/Cume';
+import { gsap, useGSAP, semMovimento } from '@/lib/movimento';
+
+const Montanhas3D = lazy(() => import('@/components/Montanhas3D'));
 
 function traduzirErro(msg: string, status?: number) {
   if (/invalid login credentials/i.test(msg)) return 'E-mail ou senha incorretos. Confira e tente de novo.';
@@ -20,6 +23,20 @@ export function Entrar() {
   const [ver, setVer] = useState(false);
   const [enviando, setEnviando] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
+  const tela = useRef<HTMLElement>(null);
+
+  // O momento da página: selo, versículo e formulário chegam em sequência, uma vez só.
+  useGSAP(
+    () => {
+      if (semMovimento()) return;
+      gsap
+        .timeline({ defaults: { ease: 'expo.out' } })
+        .from('[data-intro="selo"]', { autoAlpha: 0, scale: 0.82, duration: 0.9 })
+        .from('[data-intro="verso"]', { autoAlpha: 0, y: 12, duration: 0.8 }, '-=0.6')
+        .from('[data-intro="form"] > *', { autoAlpha: 0, y: 16, duration: 0.7, stagger: 0.06 }, '-=0.5');
+    },
+    { scope: tela },
+  );
 
   async function entrar(e: FormEvent) {
     e.preventDefault();
@@ -33,19 +50,24 @@ export function Entrar() {
   }
 
   return (
-    <main className="min-h-dvh bg-bg">
-      <div className="safe-top bg-[linear-gradient(160deg,#dd1b37_0%,#b01026_100%)] text-white">
-        <div className="mx-auto flex max-w-[420px] flex-col items-center px-4 pb-6 pt-10 text-center md:pt-14">
-          <Selo className="size-24 md:size-28" />
-          <blockquote className="mt-5">
+    <main ref={tela} className="min-h-dvh bg-bg">
+      <div className="safe-top relative overflow-hidden bg-[linear-gradient(160deg,#dd1b37_0%,#b01026_100%)] text-white">
+        <Suspense fallback={null}>
+          <Montanhas3D className="pointer-events-none absolute inset-x-0 bottom-0 h-[62%] md:h-[66%]" />
+        </Suspense>
+        <div className="relative mx-auto flex max-w-[420px] flex-col items-center px-4 pb-44 pt-10 text-center md:pb-56 md:pt-14">
+          <span data-intro="selo">
+            <Selo className="size-24 md:size-28" />
+          </span>
+          <blockquote data-intro="verso" className="mt-5 [text-shadow:0_1px_12px_rgb(90_0_15/0.35)]">
             <p className="text-[19px] font-semibold leading-snug md:text-xl">“Apascenta as minhas ovelhas.”</p>
             <footer className="mt-1 text-[13px] text-white/80">João 21:16</footer>
           </blockquote>
         </div>
-        <SerraBorda className="h-10 md:h-14" />
+        <SerraBorda className="relative h-10 md:h-14" />
       </div>
 
-      <div className="mx-auto max-w-[400px] px-4 pb-12">
+      <div data-intro="form" className="mx-auto max-w-[400px] px-4 pb-12">
         <h1 className="text-[26px] font-bold leading-tight tracking-[-0.015em]">Acompanhamento dos jovens</h1>
         <p className="mt-1.5 text-[14.5px] text-ink-2">
           Entre com o e-mail e a senha que a coordenação passou para você.

@@ -4,6 +4,7 @@ import { Toaster } from 'sonner';
 import { SessaoProvider, useSessao } from '@/hooks/sessao';
 import { FichasProvider } from '@/hooks/fichas';
 import { Topo } from '@/components/Topo';
+import { Transicao } from '@/components/Transicao';
 import { Entrar } from '@/pages/Entrar';
 import { SemAcesso } from '@/pages/SemAcesso';
 import { PrimeiraSenha } from '@/pages/PrimeiraSenha';
@@ -42,17 +43,19 @@ function Rotas() {
       <Topo />
       <div id="conteudo" tabIndex={-1} className="outline-none">
         <Suspense fallback={<Carregando />}>
-          <Switch>
-            <Route path="/" component={Acompanhamento} />
-            <Route path="/jovem/:id" component={Acompanhamento} />
-            <Route path="/conta" component={Conta} />
-            {admin ? <Route path="/painel" component={Painel} /> : null}
-            {admin ? <Route path="/jovens" component={Jovens} /> : null}
-            {admin ? <Route path="/equipe" component={Equipe} /> : null}
-            <Route>
-              <Redirect to="/" />
-            </Route>
-          </Switch>
+          <Transicao>
+            <Switch>
+              <Route path="/" component={Acompanhamento} />
+              <Route path="/jovem/:id" component={Acompanhamento} />
+              <Route path="/conta" component={Conta} />
+              {admin ? <Route path="/painel" component={Painel} /> : null}
+              {admin ? <Route path="/jovens" component={Jovens} /> : null}
+              {admin ? <Route path="/equipe" component={Equipe} /> : null}
+              <Route>
+                <Redirect to="/" />
+              </Route>
+            </Switch>
+          </Transicao>
         </Suspense>
       </div>
     </FichasProvider>

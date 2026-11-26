@@ -10,7 +10,7 @@ export default defineConfig({
   build: {
     rollupOptions: {
       output: {
-        manualChunks: { react: ['react', 'react-dom', 'wouter'], supabase: ['@supabase/supabase-js'] },
+        manualChunks: { react: ['react', 'react-dom', 'wouter'], supabase: ['@supabase/supabase-js'], gsap: ['gsap', '@gsap/react'] },
       },
     },
   },

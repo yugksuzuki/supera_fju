@@ -1,4 +1,6 @@
+import { useRef } from 'react';
 import { Link, useLocation } from 'wouter';
+import { gsap, useGSAP, semMovimento } from '@/lib/movimento';
 import { LogOut } from 'lucide-react';
 import { useSessao } from '@/hooks/sessao';
 import { useFichas } from '@/hooks/fichas';
@@ -23,6 +25,30 @@ export function Topo() {
   const iniciados = ativos.filter((f) => f.status !== 'pendente').length;
   const pct = total ? Math.round((iniciados / total) * 100) : 0;
   const abas = ABAS.filter((a) => admin || !a.admin);
+  const numero = useRef<HTMLElement>(null);
+  const mostrado = useRef({ v: 0 });
+
+  // O número sobe junto com o cume.
+  useGSAP(
+    () => {
+      const el = numero.current;
+      if (!el) return;
+      if (semMovimento()) {
+        mostrado.current.v = pct;
+        el.textContent = `${pct}%`;
+        return;
+      }
+      gsap.to(mostrado.current, {
+        v: pct,
+        duration: 1.2,
+        ease: 'expo.out',
+        onUpdate: () => {
+          el.textContent = `${Math.round(mostrado.current.v)}%`;
+        },
+      });
+    },
+    { dependencies: [pct] },
+  );
   const ativa = (href: string) =>
     href === '/' ? local === '/' || local.startsWith('/jovem/') : local.startsWith(href);
 
@@ -61,13 +87,15 @@ export function Topo() {
           </button>
         </div>
 
-        <div className="w-full md:ml-auto md:w-auto md:min-w-[280px] md:max-w-[400px] md:flex-1" aria-live="polite">
+        <div className="w-full md:ml-auto md:w-auto md:min-w-[280px] md:max-w-[400px] md:flex-1">
           <div className="flex items-baseline justify-between gap-3 text-[12.5px] text-white/90">
             <span className="tabular">
               {carregando ? 'Carregando…' : `${iniciados} de ${total} jovens já acompanhados`}
             </span>
             <span className="tabular whitespace-nowrap">
-              <strong className="font-semibold text-white">{pct}%</strong>
+              <strong ref={numero} className="font-semibold text-white">
+                0%
+              </strong>
               {concluidos ? `, ${concluidos} concluídos` : ''}
             </span>
           </div>

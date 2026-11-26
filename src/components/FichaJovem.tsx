@@ -1,4 +1,4 @@
-import { useEffect, useState, type FormEvent, type KeyboardEvent } from 'react';
+import { useEffect, useRef, useState, type FormEvent, type KeyboardEvent } from 'react';
 import { Link, useLocation } from 'wouter';
 import {
   ArrowLeft,
@@ -26,6 +26,7 @@ import { Textarea } from '@/components/ui/campos';
 import { SeloStatus } from '@/components/ui/status';
 import { Esqueleto } from '@/components/ui/esqueleto';
 import { cn, dataHora, iniciais, relativo, telefoneWhats } from '@/lib/utils';
+import { gsap, useGSAP, semMovimento, definirDirecao, consumirDirecao } from '@/lib/movimento';
 
 interface Props {
   ficha: Ficha;
@@ -38,20 +39,53 @@ export function FichaJovem({ ficha, posicao, anterior, proximo }: Props) {
   const { responder } = useFichas();
   const [, navegar] = useLocation();
   const whats = telefoneWhats(ficha.telefone);
+  const ref = useRef<HTMLElement>(null);
+  const irPara = (f: Ficha | null, d: -1 | 1) => {
+    if (!f) return;
+    definirDirecao(d);
+    navegar(`/jovem/${f.id}`);
+  };
+
+  // Anterior/próximo desliza na direção do botão; vindo da lista, só aparece
+  // (no celular entra pela direita, porque a lista fica "atrás").
+  useGSAP(
+    () => {
+      if (semMovimento()) return;
+      const d = consumirDirecao();
+      const celular = window.matchMedia('(max-width: 767px)').matches;
+      const dx = d !== 0 ? d * 28 : celular ? 36 : 0;
+      gsap.fromTo(
+        ref.current,
+        { autoAlpha: 0, x: dx },
+        { autoAlpha: 1, x: 0, duration: 0.36, clearProps: 'transform' },
+      );
+      if (d === 0) {
+        gsap.from('[data-linha]', {
+          autoAlpha: 0,
+          y: 8,
+          duration: 0.4,
+          stagger: 0.035,
+          delay: 0.05,
+          clearProps: 'transform',
+        });
+      }
+    },
+    { scope: ref },
+  );
 
   // Atalhos: Alt+← / Alt+→ trocam de jovem sem tirar a mão do teclado.
   useEffect(() => {
     const tecla = (e: globalThis.KeyboardEvent) => {
       if (!e.altKey) return;
-      if (e.key === 'ArrowLeft' && anterior) navegar(`/jovem/${anterior.id}`);
-      if (e.key === 'ArrowRight' && proximo) navegar(`/jovem/${proximo.id}`);
+      if (e.key === 'ArrowLeft') irPara(anterior, -1);
+      if (e.key === 'ArrowRight') irPara(proximo, 1);
     };
     window.addEventListener('keydown', tecla);
     return () => window.removeEventListener('keydown', tecla);
   }, [anterior, proximo, navegar]);
 
   return (
-    <article className="bg-surface md:rounded-2xl md:border md:border-line md:shadow-1">
+    <article ref={ref} className="bg-surface md:rounded-2xl md:border md:border-line md:shadow-1">
       <div className="flex items-center gap-2 border-b border-line px-2 py-2 md:hidden">
         <Link
           href="/"
@@ -134,7 +168,7 @@ export function FichaJovem({ ficha, posicao, anterior, proximo }: Props) {
         <Button
           variante="contorno"
           disabled={!anterior}
-          onClick={() => anterior && navegar(`/jovem/${anterior.id}`)}
+          onClick={() => irPara(anterior, -1)}
           aria-label={anterior ? `Anterior: ${anterior.nome}` : 'Anterior'}
           title="Anterior (Alt + ←)"
         >
@@ -148,7 +182,7 @@ export function FichaJovem({ ficha, posicao, anterior, proximo }: Props) {
         <Button
           className="ml-auto md:ml-0"
           disabled={!proximo}
-          onClick={() => proximo && navegar(`/jovem/${proximo.id}`)}
+          onClick={() => irPara(proximo, 1)}
           aria-label={proximo ? `Próximo: ${proximo.nome}` : 'Próximo'}
           title="Próximo (Alt + →)"
         >
@@ -196,7 +230,10 @@ function PerguntaLinha({
   };
 
   return (
-    <div className="grid gap-2.5 border-t border-line py-4 first:border-t-0 md:grid-cols-[minmax(0,1fr)_minmax(0,1.35fr)] md:items-center md:gap-6">
+    <div
+      data-linha
+      className="grid gap-2.5 border-t border-line py-4 first:border-t-0 md:grid-cols-[minmax(0,1fr)_minmax(0,1.35fr)] md:items-center md:gap-6"
+    >
       <span id={id} className="text-[14.5px] font-semibold">
         {pergunta.rotulo}
       </span>
@@ -212,10 +249,19 @@ function PerguntaLinha({
               aria-checked={on}
               data-valor={o.valor}
               tabIndex={on || (idx < 0 && i === 0) ? 0 : -1}
-              onClick={() => onEscolher(on ? null : o.valor)}
+              onClick={(e) => {
+                onEscolher(on ? null : o.valor);
+                if (!semMovimento()) {
+                  gsap.fromTo(
+                    e.currentTarget,
+                    { scale: 0.93 },
+                    { scale: 1, duration: 0.42, ease: 'back.out(3)', clearProps: 'transform' },
+                  );
+                }
+              }}
               title={on ? 'Toque de novo para desmarcar' : undefined}
               className={cn(
-                'inline-flex min-h-11 flex-1 items-center justify-center gap-1.5 rounded-xl border-[1.5px] px-3 py-2 text-sm font-semibold leading-tight transition-[background-color,border-color,color,transform] duration-150 ease-out active:scale-[0.97]',
+                'inline-flex min-h-11 flex-1 items-center justify-center gap-1.5 rounded-xl border-[1.5px] px-3 py-2 text-sm font-semibold leading-tight transition-[background-color,border-color,color] duration-150 ease-out',
                 on ? LIGADO[o.tom] : 'border-line-strong bg-surface text-ink hover:border-brand-600',
               )}
             >

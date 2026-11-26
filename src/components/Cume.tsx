@@ -1,4 +1,6 @@
+import { useRef } from 'react';
 import { cn } from '@/lib/utils';
+import { gsap, useGSAP, semMovimento } from '@/lib/movimento';
 
 /*
   A serra do selo SUPERA usada como barra de progresso: a equipe "sobe" conforme os
@@ -22,6 +24,18 @@ function Desenho({ className }: { className?: string }) {
 
 export function Cume({ pct, rotulo, className }: { pct: number; rotulo: string; className?: string }) {
   const p = Math.max(0, Math.min(100, pct));
+  const cheio = useRef<HTMLDivElement>(null);
+
+  // A subida acompanha o progresso: cresce devagar até o novo ponto.
+  useGSAP(
+    () => {
+      const alvo = `inset(0 ${100 - p}% 0 0)`;
+      if (semMovimento()) gsap.set(cheio.current, { clipPath: alvo });
+      else gsap.to(cheio.current, { clipPath: alvo, duration: 1.2, ease: 'expo.out' });
+    },
+    { dependencies: [p] },
+  );
+
   return (
     <div
       role="progressbar"
@@ -32,10 +46,7 @@ export function Cume({ pct, rotulo, className }: { pct: number; rotulo: string; 
       className={cn('relative', className)}
     >
       <Desenho className="fill-white/22 stroke-white/40" />
-      <div
-        className="absolute inset-0 transition-[clip-path] duration-700 ease-[cubic-bezier(0.16,1,0.3,1)]"
-        style={{ clipPath: `inset(0 ${100 - p}% 0 0)` }}
-      >
+      <div ref={cheio} className="absolute inset-0" style={{ clipPath: 'inset(0 100% 0 0)' }}>
         <Desenho className="fill-white stroke-white" />
       </div>
     </div>

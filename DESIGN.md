@@ -30,4 +30,9 @@ Modo escuro por `prefers-color-scheme` ou `data-theme="dark"`.
 - Respostas Sim/Não são grupos de rádio (setas do teclado funcionam); tocar de novo desmarca.
 - Ícones lucide, nunca emoji. Números com `tabular-nums`.
 - Sem modais para tarefas: formulários de cadastro abrem em painel lateral.
-- Movimento só para estado (150–250 ms); respeita `prefers-reduced-motion`.
+- Movimento (GSAP, `src/lib/movimento.ts`) só para mostrar o que mudou; `prefers-reduced-motion` desliga tudo:
+  - troca de aba: fade 240 ms (abas não têm relação espacial, nada desliza);
+  - anterior/próximo jovem: desliza na direção do botão; lista → ficha no celular entra pela direita;
+  - resposta marcada: "toque" de escala no botão; painel: barras crescem da esquerda; topo: o cume sobe e o % conta.
+- Three.js só no login (`src/components/Montanhas3D.tsx`, carregado sob demanda): a serra facetada do selo com a
+  bandeira no cume, paralaxe leve com mouse/dedo, pausa fora da tela. É o único momento "de palco" do app.
