@@ -1,0 +1,186 @@
+@import 'tailwindcss';
+@import '@fontsource/poppins/latin-400.css';
+@import '@fontsource/poppins/latin-500.css';
+@import '@fontsource/poppins/latin-600.css';
+@import '@fontsource/poppins/latin-700.css';
+
+/*
+  Identidade SUPERA: vermelho do selo (#ff2a44), branco e um rosado quente de fundo.
+  O vermelho puro (#ff2a44) só aparece como destaque; texto branco vai sobre os
+  tons mais fundos (--brand-600 em diante) para passar contraste AA.
+*/
+:root {
+  --brand-400: #ff2a44;
+  --brand-500: #e8213d;
+  --brand-600: #d91a36;
+  --brand-700: #b01026;
+  --brand-800: #8c0c1e;
+
+  --bg: #fff8f7;
+  --surface: #ffffff;
+  --surface-2: #fdf0f0;
+  --ink: #2a1215;
+  --ink-2: #6f5156;
+  --line: #f1d6d9;
+  --line-strong: #e4b9be;
+  --tint: #ffe9ec;
+  --tint-ink: #a50f25;
+
+  --ok: #15803d;
+  --ok-tint: #e3f6ea;
+  --warn: #b45309;
+  --warn-dot: #f59e0b;
+  --warn-tint: #fdf1dc;
+  --idle: #c9aeb2;
+  --on-ok: #ffffff;
+
+  --ring: var(--brand-600);
+  --shadow-1: 0 1px 2px rgb(74 10 20 / 0.06), 0 2px 8px rgb(74 10 20 / 0.05);
+  --shadow-2: 0 4px 12px rgb(74 10 20 / 0.08), 0 12px 32px rgb(74 10 20 / 0.08);
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --bg: #170a0c;
+    --surface: #221114;
+    --surface-2: #2b161a;
+    --ink: #fbeeee;
+    --ink-2: #c9a3a8;
+    --line: #42232a;
+    --line-strong: #5c303a;
+    --tint: #3a1820;
+    --tint-ink: #ff8a99;
+    --ok: #4ade80;
+    --ok-tint: #12301f;
+    --warn: #fbbf24;
+    --warn-tint: #36260b;
+    --idle: #6a4a50;
+    --on-ok: #06240f;
+    --ring: #ff6b7d;
+    --shadow-1: 0 1px 2px rgb(0 0 0 / 0.3);
+    --shadow-2: 0 8px 24px rgb(0 0 0 / 0.4);
+    color-scheme: dark;
+  }
+}
+:root[data-theme='dark'] {
+  --bg: #170a0c;
+  --surface: #221114;
+  --surface-2: #2b161a;
+  --ink: #fbeeee;
+  --ink-2: #c9a3a8;
+  --line: #42232a;
+  --line-strong: #5c303a;
+  --tint: #3a1820;
+  --tint-ink: #ff8a99;
+  --ok: #4ade80;
+  --ok-tint: #12301f;
+  --warn: #fbbf24;
+  --warn-tint: #36260b;
+  --idle: #6a4a50;
+  --on-ok: #06240f;
+  --ring: #ff6b7d;
+  --shadow-1: 0 1px 2px rgb(0 0 0 / 0.3);
+  --shadow-2: 0 8px 24px rgb(0 0 0 / 0.4);
+  color-scheme: dark;
+}
+
+@theme inline {
+  --font-sans: 'Poppins', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --color-brand-400: var(--brand-400);
+  --color-brand-500: var(--brand-500);
+  --color-brand-600: var(--brand-600);
+  --color-brand-700: var(--brand-700);
+  --color-brand-800: var(--brand-800);
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-tint: var(--tint);
+  --color-tint-ink: var(--tint-ink);
+  --color-ok: var(--ok);
+  --color-ok-tint: var(--ok-tint);
+  --color-warn: var(--warn);
+  --color-warn-dot: var(--warn-dot);
+  --color-warn-tint: var(--warn-tint);
+  --color-idle: var(--idle);
+  --color-on-ok: var(--on-ok);
+  --color-ring: var(--ring);
+  --shadow-1: var(--shadow-1);
+  --shadow-2: var(--shadow-2);
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    font-size: 15px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  ::selection {
+    background: var(--tint);
+    color: var(--tint-ink);
+  }
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
+  input,
+  textarea,
+  select {
+    caret-color: var(--brand-600);
+  }
+  ::placeholder {
+    color: var(--ink-2);
+    opacity: 0.8;
+  }
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+  }
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--line-strong) transparent;
+  }
+  a {
+    text-underline-offset: 3px;
+  }
+}
+
+@layer utilities {
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+  .safe-top {
+    padding-top: env(safe-area-inset-top, 0px);
+  }
+  .safe-bottom {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  .cv-auto {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 56px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}
