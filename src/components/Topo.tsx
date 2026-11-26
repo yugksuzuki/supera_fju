@@ -3,6 +3,7 @@ import { LogOut } from 'lucide-react';
 import { useSessao } from '@/hooks/sessao';
 import { useFichas } from '@/hooks/fichas';
 import { Selo } from './Selo';
+import { Cume } from './Cume';
 import { cn } from '@/lib/utils';
 
 const ABAS = [
@@ -27,29 +28,28 @@ export function Topo() {
 
   return (
     <header className="safe-top bg-[linear-gradient(135deg,#dd1b37_0%,#b01026_100%)] text-white">
-      <div className="mx-auto flex max-w-[1240px] flex-wrap items-center gap-x-5 gap-y-3 px-4 pb-0 pt-3 md:px-6 md:pt-4">
+      <div className="mx-auto flex max-w-[1240px] flex-wrap items-center gap-x-6 gap-y-3 px-4 pt-3 md:px-6 md:pt-4">
         <Link
           href="/"
-          className="flex min-w-0 flex-1 items-center gap-3 rounded-2xl md:flex-none outline-offset-4 focus-visible:outline-white"
+          className="flex min-w-0 flex-1 items-center gap-3 rounded-2xl outline-offset-4 focus-visible:outline-white md:flex-none"
         >
           <Selo className="size-12 md:size-14" />
           <span className="min-w-0 leading-tight">
-            <span className="block truncate text-base font-bold tracking-[0.02em] md:text-lg">
-              <span translate="no">SUPERA</span> · Acompanhamento
+            <span className="block truncate text-base font-bold tracking-[0.01em] md:text-lg">
+              <span translate="no">SUPERA</span> Acompanhamento
             </span>
-            <span className="block truncate text-xs text-white/85 md:text-[12.5px]">
-              Força Jovem Universal · João 21:16
-            </span>
+            <span className="block truncate text-xs text-white/85 md:text-[12.5px]">Força Jovem Universal</span>
           </span>
         </Link>
 
-        <div className="ml-auto flex shrink-0 items-center gap-2 md:order-last">
-          <span
-            className="hidden max-w-[180px] truncate text-[13px] text-white/90 sm:block"
-            title={perfil?.email ?? ''}
+        <div className="ml-auto flex shrink-0 items-center gap-1 md:order-last">
+          <Link
+            href="/conta"
+            className="hidden max-w-[200px] truncate rounded-lg px-2 py-1.5 text-[13px] text-white/90 underline-offset-4 hover:text-white hover:underline focus-visible:outline-white sm:block"
+            title="Minha conta"
           >
             {perfil?.nome}
-          </span>
+          </Link>
           <button
             type="button"
             onClick={sair}
@@ -61,33 +61,22 @@ export function Topo() {
           </button>
         </div>
 
-        <div className="flex w-full items-center gap-4 md:ml-auto md:w-auto md:min-w-[260px] md:max-w-[380px] md:flex-1">
-          <div className="flex-1" aria-live="polite">
-            <div className="flex items-baseline justify-between text-[12.5px] text-white/90">
-              <span className="tabular">
-                {carregando ? 'Carregando…' : `${concluidos} concluídos · ${iniciados} de ${total} iniciados`}
-              </span>
-              <span className="tabular font-semibold text-white">{pct}%</span>
-            </div>
-            <div
-              className="mt-1.5 h-2 overflow-hidden rounded-full bg-white/20"
-              role="progressbar"
-              aria-valuenow={pct}
-              aria-valuemin={0}
-              aria-valuemax={100}
-              aria-label="Jovens com acompanhamento iniciado"
-            >
-              <div
-                className="h-full rounded-full bg-white transition-[width] duration-500 ease-out"
-                style={{ width: `${pct}%` }}
-              />
-            </div>
+        <div className="w-full md:ml-auto md:w-auto md:min-w-[280px] md:max-w-[400px] md:flex-1" aria-live="polite">
+          <div className="flex items-baseline justify-between gap-3 text-[12.5px] text-white/90">
+            <span className="tabular">
+              {carregando ? 'Carregando…' : `${iniciados} de ${total} jovens já acompanhados`}
+            </span>
+            <span className="tabular whitespace-nowrap">
+              <strong className="font-semibold text-white">{pct}%</strong>
+              {concluidos ? `, ${concluidos} concluídos` : ''}
+            </span>
           </div>
+          <Cume pct={pct} rotulo="Jovens com acompanhamento iniciado" className="mt-1 h-10" />
         </div>
       </div>
 
       {abas.length > 1 ? (
-        <div className="mx-auto mt-3 flex max-w-[1240px] items-end px-1.5 md:px-4">
+        <div className="mx-auto mt-2 flex max-w-[1240px] items-end px-1.5 md:px-4">
           <nav aria-label="Seções" className="-mb-px flex overflow-x-auto">
             {abas.map((a) => (
               <Link
@@ -95,7 +84,7 @@ export function Topo() {
                 href={a.href}
                 aria-current={ativa(a.href) ? 'page' : undefined}
                 className={cn(
-                  'relative shrink-0 rounded-t-xl px-3 py-2.5 text-sm sm:px-4 font-semibold transition-colors duration-150 focus-visible:outline-white',
+                  'relative shrink-0 rounded-t-xl px-3 py-2.5 text-sm font-semibold transition-colors duration-150 focus-visible:outline-white sm:px-4',
                   ativa(a.href) ? 'bg-bg text-tint-ink' : 'text-white/85 hover:bg-white/10 hover:text-white',
                 )}
               >

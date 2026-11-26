@@ -15,6 +15,7 @@ interface Rascunho {
   email: string;
   papel: Papel;
   ativo: boolean;
+  senha: string;
 }
 
 export default function Equipe() {
@@ -46,6 +47,9 @@ export default function Equipe() {
     if (eu && (rascunho.papel !== 'admin' || !rascunho.ativo)) {
       return toast.error('Você não pode tirar o seu próprio acesso de admin. Peça a outro admin.');
     }
+    const senha = rascunho.senha;
+    if (senha && senha.length < 8) return toast.error('A senha precisa ter pelo menos 8 caracteres.');
+    if (senha && !rascunho.email.trim()) return toast.error('Para criar a senha, preencha o e-mail.');
     setSalvando(true);
     const dados = {
       nome: rascunho.nome.trim(),
@@ -53,21 +57,38 @@ export default function Equipe() {
       papel: rascunho.papel,
       ativo: rascunho.ativo,
     };
-    const { error } = rascunho.id
-      ? await supabase.from('responsaveis').update(dados).eq('id', rascunho.id)
-      : await supabase.from('responsaveis').insert(dados);
-    setSalvando(false);
-    if (error) {
-      return toast.error(error.code === '23505' ? 'Esse e-mail já está na equipe.' : 'Não foi possível salvar.');
+    const { data: salvo, error } = rascunho.id
+      ? await supabase.from('responsaveis').update(dados).eq('id', rascunho.id).select('id').single()
+      : await supabase.from('responsaveis').insert(dados).select('id').single();
+    if (error || !salvo) {
+      setSalvando(false);
+      return toast.error(error?.code === '23505' ? 'Esse e-mail já está na equipe.' : 'Não foi possível salvar.');
     }
-    toast.success(rascunho.id ? 'Cadastro atualizado.' : `${dados.nome} foi adicionado à equipe.`);
+    if (senha) {
+      const { error: erroSenha } = await supabase.functions.invoke('acessos', {
+        body: { responsavel_id: salvo.id, senha },
+      });
+      if (erroSenha) {
+        setSalvando(false);
+        carregar();
+        return toast.error('O cadastro foi salvo, mas a senha não. Abra a pessoa e tente definir a senha de novo.');
+      }
+    }
+    setSalvando(false);
+    toast.success(
+      senha
+        ? `Senha de ${dados.nome.split(' ')[0]} definida. Copie o convite e mande junto com a senha.`
+        : rascunho.id
+          ? 'Cadastro atualizado.'
+          : `${dados.nome} foi adicionado à equipe. Defina uma senha para liberar o acesso.`,
+    );
     setRascunho(null);
     carregar();
     recarregar();
   }
 
   const convite = (r: Responsavel) =>
-    `Olá, ${r.nome.split(' ')[0]}! Você já pode registrar o acompanhamento dos jovens do SUPERA em ${window.location.origin}. Entre com o e-mail ${r.email} e use o código que chegar na sua caixa de entrada.`;
+    `Olá, ${r.nome.split(' ')[0]}! Você já pode registrar o acompanhamento dos jovens do SUPERA em ${window.location.origin}. Entre com o e-mail ${r.email} e a senha que eu te passei. Depois, se quiser, troque a senha clicando no seu nome lá em cima.`;
 
   return (
     <main className="mx-auto grid max-w-[1240px] items-start gap-5 px-4 py-5 md:px-6 lg:grid-cols-[minmax(0,1fr)_380px]">
@@ -75,9 +96,11 @@ export default function Equipe() {
         <div className="flex flex-wrap items-center gap-3 border-b border-line p-4 md:px-5">
           <div className="mr-auto">
             <h1 className="text-xl font-bold">Equipe</h1>
-            <p className="mt-0.5 text-sm text-ink-2">Só entra no sistema quem está aqui, ativo e com e-mail.</p>
+            <p className="mt-0.5 text-sm text-ink-2">Só entra no sistema quem está aqui, ativo, com e-mail e senha.</p>
           </div>
-          <Button onClick={() => setRascunho({ id: null, nome: '', email: '', papel: 'voluntario', ativo: true })}>
+          <Button
+            onClick={() => setRascunho({ id: null, nome: '', email: '', papel: 'voluntario', ativo: true, senha: '' })}
+          >
             <Plus /> Adicionar pessoa
           </Button>
         </div>
@@ -100,10 +123,9 @@ export default function Equipe() {
                   ) : null}
                   {!r.ativo ? <span className="text-xs font-normal text-ink-2">(sem acesso)</span> : null}
                 </p>
-                <p className="truncate text-[13px] text-ink-2">
-                  {r.email ?? 'Sem e-mail: ainda não consegue entrar'}
-                  {' · '}
-                  <span className="tabular">{jovensPor.get(r.id) ?? 0}</span> jovens
+                <p className="flex flex-wrap gap-x-3 text-[13px] text-ink-2">
+                  <span className="truncate">{r.email ?? 'Sem e-mail: ainda não consegue entrar'}</span>
+                  <span className="tabular">{jovensPor.get(r.id) ?? 0} jovens</span>
                 </p>
               </div>
               <span
@@ -112,10 +134,10 @@ export default function Equipe() {
                   r.user_id ? 'bg-ok-tint text-ok' : 'bg-surface-2 text-ink-2',
                 )}
               >
-                {r.user_id ? 'Já entrou' : 'Ainda não entrou'}
+                {r.user_id ? 'Com acesso' : 'Sem senha'}
               </span>
               <div className="flex gap-1.5">
-                {r.email && !r.user_id && r.ativo ? (
+                {r.email && r.user_id && r.ativo && r.id !== perfil?.id ? (
                   <Button
                     variante="fantasma"
                     tamanho="sm"
@@ -133,7 +155,14 @@ export default function Equipe() {
                   variante="contorno"
                   tamanho="sm"
                   onClick={() =>
-                    setRascunho({ id: r.id, nome: r.nome, email: r.email ?? '', papel: r.papel, ativo: r.ativo })
+                    setRascunho({
+                      id: r.id,
+                      nome: r.nome,
+                      email: r.email ?? '',
+                      papel: r.papel,
+                      ativo: r.ativo,
+                      senha: '',
+                    })
                   }
                 >
                   Editar
@@ -164,7 +193,7 @@ export default function Equipe() {
               />
             </div>
             <div>
-              <Rotulo htmlFor="e-email" dica="(o código de acesso chega aqui)">
+              <Rotulo htmlFor="e-email" dica="(é o login da pessoa)">
                 E-mail
               </Rotulo>
               <Input
@@ -175,6 +204,22 @@ export default function Equipe() {
                 spellCheck={false}
                 value={rascunho.email}
                 onChange={(e) => setRascunho({ ...rascunho, email: e.target.value })}
+              />
+            </div>
+            <div>
+              <Rotulo
+                htmlFor="e-senha"
+                dica={rascunho.id ? '(deixe vazio para manter a atual)' : '(mínimo 8 caracteres)'}
+              >
+                {rascunho.id ? 'Nova senha' : 'Senha'}
+              </Rotulo>
+              <Input
+                id="e-senha"
+                type="text"
+                autoComplete="new-password"
+                spellCheck={false}
+                value={rascunho.senha}
+                onChange={(e) => setRascunho({ ...rascunho, senha: e.target.value })}
               />
             </div>
             <div>
@@ -210,8 +255,8 @@ export default function Equipe() {
         ) : (
           <div className="space-y-2 rounded-2xl border border-dashed border-line-strong p-6 text-sm text-ink-2">
             <p>
-              Para liberar alguém: adicione a pessoa com o e-mail dela e envie o convite. Ela entra com o código que
-              chega por e-mail, sem senha.
+              Para liberar alguém: adicione a pessoa com o e-mail e uma senha, depois copie o convite e mande no
+              WhatsApp junto com a senha. Ela pode trocar a senha depois, clicando no próprio nome.
             </p>
             <p>Para passar jovens de uma pessoa para outra, use a aba Jovens.</p>
           </div>

@@ -1,6 +1,6 @@
 import { useDeferredValue, useMemo, useState, type ReactNode } from 'react';
 import { useLocation, useRoute } from 'wouter';
-import { Search, X, ArrowRight, RefreshCw } from 'lucide-react';
+import { Search, X, RefreshCw } from 'lucide-react';
 import { useFichas } from '@/hooks/fichas';
 import { useSessao } from '@/hooks/sessao';
 import { Input, Select } from '@/components/ui/campos';
@@ -239,7 +239,7 @@ export function Acompanhamento() {
           >
             {proximoPendente ? (
               <Button onClick={() => navegar(`/jovem/${proximoPendente.id}`)}>
-                Começar por {proximoPendente.nome.split(' ')[0]} <ArrowRight />
+                Começar por {proximoPendente.nome.split(' ')[0]}
               </Button>
             ) : null}
           </Vazio>
@@ -276,15 +276,17 @@ function ItemLista({
           <span className={cn('block truncate text-[14.5px] font-semibold', ativo ? 'text-tint-ink' : 'text-ink')}>
             {ficha.nome}
           </span>
-          <span className="block truncate text-[12.5px] text-ink-2">
-            {ficha.aulas.join(' · ') || 'Sem aula'}
-            {mostrarResp && ficha.responsavel_nome
-              ? ` · ${ficha.responsavel_nome
+          <span className="flex min-w-0 gap-2.5 text-[12.5px] text-ink-2">
+            <span className="truncate">{ficha.aulas.join(', ') || 'Sem aula'}</span>
+            {mostrarResp && ficha.responsavel_nome ? (
+              <span className="shrink-0 text-ink-2/80">
+                {ficha.responsavel_nome
                   .replace(/^Obr\.?\s+/, 'Obr ')
                   .split(' ')
                   .slice(0, 2)
-                  .join(' ')}`
-              : ''}
+                  .join(' ')}
+              </span>
+            ) : null}
           </span>
         </span>
         {ficha.total_notas > 0 ? (

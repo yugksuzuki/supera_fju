@@ -19,6 +19,12 @@ Refinamento da identidade do esboço original, não um visual novo.
 
 Modo escuro por `prefers-color-scheme` ou `data-theme="dark"`.
 
+## Elemento marcante (frontend-design: ousadia em um lugar só)
+- **O cume:** a serra do selo vira a barra de progresso do topo; a parte branca sobe conforme os jovens são
+  acompanhados e a bandeira fica no pico (100%). A mesma serra fecha a faixa vermelha do login.
+- Login abre com o versículo do programa, João 21:16, por extenso.
+- Fora isso, tudo quieto: sem textos de meta com "·", sem seta em botão, sem sombra repetida em todo cartão.
+
 ## Regras
 - Status sempre com cor **e** rótulo (bolinha + texto, ou `aria-label`).
 - Respostas Sim/Não são grupos de rádio (setas do teclado funcionam); tocar de novo desmarca.

@@ -8,4 +8,8 @@
 - Mudança de esquema: novo arquivo em `supabase/migrations/` + aplicar no projeto + rodar os advisors.
 - Acesso: `privado.sou_admin()`, `privado.meu_responsavel_id()`, `privado.posso_ver_jovem()` (security definer).
   A view `public.fichas` é `security_invoker` e alimenta lista, painel e CSV.
-- Pendências de go-live: `docs/pendencias.md`.
+- Login: e-mail + senha. Senhas de terceiros só pela Edge Function `acessos` (verifica admin). Nunca escrever
+  senha em arquivo do repositório.
+- Design: impeccable + frontend-design. O elemento marcante é o "cume" (`src/components/Cume.tsx`): a serra
+  do selo como barra de progresso. Não espalhar outros enfeites.
+- Pendências de go-live: `docs/pendencias.md`; publicação: `docs/claude-no-chrome.md`.

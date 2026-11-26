@@ -12,6 +12,7 @@ import { Esqueleto } from '@/components/ui/esqueleto';
 const Painel = lazy(() => import('@/pages/Painel'));
 const Jovens = lazy(() => import('@/pages/Jovens'));
 const Equipe = lazy(() => import('@/pages/Equipe'));
+const Conta = lazy(() => import('@/pages/Conta'));
 
 function Carregando() {
   return (
@@ -42,6 +43,7 @@ function Rotas() {
           <Switch>
             <Route path="/" component={Acompanhamento} />
             <Route path="/jovem/:id" component={Acompanhamento} />
+            <Route path="/conta" component={Conta} />
             {admin ? <Route path="/painel" component={Painel} /> : null}
             {admin ? <Route path="/jovens" component={Jovens} /> : null}
             {admin ? <Route path="/equipe" component={Equipe} /> : null}

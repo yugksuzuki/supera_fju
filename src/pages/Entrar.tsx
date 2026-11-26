@@ -1,133 +1,115 @@
 import { useState, type FormEvent } from 'react';
-import { ArrowLeft, Loader2, Mail } from 'lucide-react';
+import { Eye, EyeOff, Loader2 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { Button } from '@/components/ui/button';
 import { Input, Rotulo } from '@/components/ui/campos';
 import { Selo } from '@/components/Selo';
+import { SerraBorda } from '@/components/Cume';
 
 function traduzirErro(msg: string, status?: number) {
-  if (/database error saving new user/i.test(msg) || /signups not allowed/i.test(msg))
-    return 'Este e-mail não está na equipe do SUPERA. Peça ao responsável pelo sistema para cadastrar você.';
-  if (status === 429 || /rate limit|security purposes/i.test(msg))
+  if (/invalid login credentials/i.test(msg)) return 'E-mail ou senha incorretos. Confira e tente de novo.';
+  if (/email not confirmed/i.test(msg)) return 'Esse acesso ainda não foi liberado. Fale com a coordenação.';
+  if (status === 429 || /rate limit|too many/i.test(msg))
     return 'Muitas tentativas seguidas. Espere um minuto e tente de novo.';
-  if (/expired|invalid/i.test(msg)) return 'Código inválido ou vencido. Confira os números ou peça um novo código.';
-  return 'Algo deu errado. Confira a internet e tente de novo.';
+  return 'Não foi possível entrar. Confira a internet e tente de novo.';
 }
 
 export function Entrar() {
   const [email, setEmail] = useState('');
-  const [codigo, setCodigo] = useState('');
-  const [etapa, setEtapa] = useState<'email' | 'codigo'>('email');
+  const [senha, setSenha] = useState('');
+  const [ver, setVer] = useState(false);
   const [enviando, setEnviando] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
 
-  async function pedirCodigo(e: FormEvent) {
+  async function entrar(e: FormEvent) {
     e.preventDefault();
+    if (!/\S+@\S+\.\S+/.test(email.trim())) return setErro('Digite o e-mail completo, como voce@gmail.com.');
+    if (!senha) return setErro('Digite a sua senha.');
     setErro(null);
     setEnviando(true);
-    const { error } = await supabase.auth.signInWithOtp({
-      email: email.trim(),
-      options: { shouldCreateUser: true, emailRedirectTo: window.location.origin },
-    });
-    setEnviando(false);
-    if (error) return setErro(traduzirErro(error.message, error.status));
-    setEtapa('codigo');
-  }
-
-  async function confirmar(e: FormEvent) {
-    e.preventDefault();
-    setErro(null);
-    setEnviando(true);
-    const { error } = await supabase.auth.verifyOtp({ email: email.trim(), token: codigo.trim(), type: 'email' });
+    const { error } = await supabase.auth.signInWithPassword({ email: email.trim(), password: senha });
     setEnviando(false);
     if (error) setErro(traduzirErro(error.message, error.status));
   }
 
   return (
     <main className="min-h-dvh bg-bg">
-      <div className="safe-top h-44 bg-[linear-gradient(135deg,#dd1b37_0%,#b01026_100%)] md:h-56" />
-      <div className="mx-auto -mt-24 max-w-[420px] px-4 pb-10 md:-mt-28">
-        <div className="flex flex-col items-center text-center text-white">
+      <div className="safe-top bg-[linear-gradient(160deg,#dd1b37_0%,#b01026_100%)] text-white">
+        <div className="mx-auto flex max-w-[420px] flex-col items-center px-4 pb-6 pt-10 text-center md:pt-14">
           <Selo className="size-24 md:size-28" />
+          <blockquote className="mt-5">
+            <p className="text-[19px] font-semibold leading-snug md:text-xl">“Apascenta as minhas ovelhas.”</p>
+            <footer className="mt-1 text-[13px] text-white/80">João 21:16</footer>
+          </blockquote>
         </div>
-        <div className="mt-5 rounded-3xl border border-line bg-surface p-6 shadow-2 md:p-8">
-          <h1 className="text-center text-[22px] font-bold leading-tight text-ink">Acompanhamento SUPERA</h1>
-          <p className="mx-auto mt-1.5 max-w-[34ch] text-center text-sm text-ink-2">
-            {etapa === 'email'
-              ? 'Entre com o e-mail que você passou para a coordenação.'
-              : `Enviamos um código para ${email}. Digite abaixo ou toque no link do e-mail.`}
-          </p>
+        <SerraBorda className="h-10 md:h-14" />
+      </div>
 
-          {etapa === 'email' ? (
-            <form onSubmit={pedirCodigo} className="mt-6 space-y-4" noValidate>
-              <div>
-                <Rotulo htmlFor="email">E-mail</Rotulo>
-                <Input
-                  id="email"
-                  type="email"
-                  inputMode="email"
-                  autoComplete="email"
-                  spellCheck={false}
-                  name="email"
-                  autoFocus
-                  required
-                  placeholder="voce@exemplo.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  aria-invalid={erro ? true : undefined}
-                  aria-describedby={erro ? 'erro-login' : undefined}
-                />
-              </div>
-              <Button type="submit" tamanho="lg" className="w-full" disabled={enviando || !/\S+@\S+\.\S+/.test(email)}>
-                {enviando ? <Loader2 className="animate-spin" /> : <Mail />}
-                {enviando ? 'Enviando…' : 'Receber código por e-mail'}
-              </Button>
-            </form>
-          ) : (
-            <form onSubmit={confirmar} className="mt-6 space-y-4" noValidate>
-              <div>
-                <Rotulo htmlFor="codigo">Código</Rotulo>
-                <Input
-                  id="codigo"
-                  inputMode="numeric"
-                  autoComplete="one-time-code"
-                  spellCheck={false}
-                  name="codigo"
-                  autoFocus
-                  maxLength={10}
-                  placeholder="000000"
-                  value={codigo}
-                  onChange={(e) => setCodigo(e.target.value.replace(/\D/g, ''))}
-                  className="h-14 text-center text-2xl font-semibold tracking-[0.3em] tabular"
-                  aria-invalid={erro ? true : undefined}
-                  aria-describedby={erro ? 'erro-login' : undefined}
-                />
-              </div>
-              <Button type="submit" tamanho="lg" className="w-full" disabled={enviando || codigo.length < 6}>
-                {enviando ? <Loader2 className="animate-spin" /> : null}
-                {enviando ? 'Confirmando…' : 'Entrar'}
-              </Button>
-              <Button
-                variante="fantasma"
-                className="w-full"
-                onClick={() => {
-                  setEtapa('email');
-                  setCodigo('');
-                  setErro(null);
-                }}
+      <div className="mx-auto max-w-[400px] px-4 pb-12">
+        <h1 className="text-[26px] font-bold leading-tight tracking-[-0.015em]">Acompanhamento dos jovens</h1>
+        <p className="mt-1.5 text-[14.5px] text-ink-2">
+          Entre com o e-mail e a senha que a coordenação passou para você.
+        </p>
+
+        <form onSubmit={entrar} className="mt-6 space-y-4" noValidate>
+          <div>
+            <Rotulo htmlFor="email">E-mail</Rotulo>
+            <Input
+              id="email"
+              name="email"
+              type="email"
+              inputMode="email"
+              autoComplete="username"
+              spellCheck={false}
+              placeholder="voce@gmail.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              aria-invalid={erro ? true : undefined}
+              aria-describedby={erro ? 'erro-login' : undefined}
+            />
+          </div>
+          <div>
+            <Rotulo htmlFor="senha">Senha</Rotulo>
+            <div className="relative">
+              <Input
+                id="senha"
+                name="senha"
+                type={ver ? 'text' : 'password'}
+                autoComplete="current-password"
+                spellCheck={false}
+                value={senha}
+                onChange={(e) => setSenha(e.target.value)}
+                className="pr-12"
+                aria-invalid={erro ? true : undefined}
+                aria-describedby={erro ? 'erro-login' : undefined}
+              />
+              <button
+                type="button"
+                onClick={() => setVer((v) => !v)}
+                aria-label={ver ? 'Esconder senha' : 'Mostrar senha'}
+                aria-pressed={ver}
+                className="absolute right-1 top-1/2 inline-flex size-9 -translate-y-1/2 items-center justify-center rounded-lg text-ink-2 hover:bg-surface-2 hover:text-ink"
               >
-                <ArrowLeft /> Usar outro e-mail
-              </Button>
-            </form>
-          )}
+                {ver ? <EyeOff className="size-[18px]" /> : <Eye className="size-[18px]" />}
+              </button>
+            </div>
+          </div>
 
           {erro ? (
-            <p id="erro-login" role="alert" className="mt-4 rounded-xl bg-tint px-3.5 py-3 text-sm text-tint-ink">
+            <p id="erro-login" role="alert" className="rounded-xl bg-tint px-3.5 py-3 text-sm text-tint-ink">
               {erro}
             </p>
           ) : null}
-        </div>
-        <p className="mt-6 text-center text-xs text-ink-2">Formando jovens visionários</p>
+
+          <Button type="submit" tamanho="lg" className="w-full" disabled={enviando}>
+            {enviando ? <Loader2 className="animate-spin" /> : null}
+            {enviando ? 'Entrando…' : 'Entrar'}
+          </Button>
+        </form>
+
+        <p className="mt-5 text-[13px] text-ink-2">
+          Esqueceu a senha? A coordenação cria uma nova para você na aba Equipe.
+        </p>
       </div>
     </main>
   );
