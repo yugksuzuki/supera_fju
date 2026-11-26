@@ -54,14 +54,18 @@ function useInstalacao() {
 
 function PassosIOS() {
   return (
-    <ol className="mt-2 space-y-1.5 text-[13.5px]">
-      <li className="flex items-center gap-2">
-        <Share className="size-4 shrink-0 text-tint-ink" aria-hidden />
-        No Safari, toque em <strong>Compartilhar</strong> (o quadrado com a seta).
+    <ol className="mt-2 space-y-1.5 text-[13.5px] leading-snug">
+      <li className="flex items-start gap-2">
+        <Share className="mt-0.5 size-4 shrink-0 text-tint-ink" aria-hidden />
+        <span>
+          No Safari, toque em <strong>Compartilhar</strong> (o quadrado com a seta).
+        </span>
       </li>
-      <li className="flex items-center gap-2">
-        <SquarePlus className="size-4 shrink-0 text-tint-ink" aria-hidden />
-        Escolha <strong>Adicionar à Tela de Início</strong> e toque em Adicionar.
+      <li className="flex items-start gap-2">
+        <SquarePlus className="mt-0.5 size-4 shrink-0 text-tint-ink" aria-hidden />
+        <span>
+          Escolha <strong>Adicionar à Tela de Início</strong> e toque em Adicionar.
+        </span>
       </li>
     </ol>
   );
